@@ -40,12 +40,6 @@ coefs_df <- do.call(rbind, coefs_df_list)
 rownames(coefs_df) <- NULL
 write_xlsx(coefs_df, path = "Parametros_Modelo_ingles.xlsx")
 write_xlsx(BITEMS, path = "Base_Items_Depurada.xlsx")
-
-
-
-
-
-
 flextable(Paramodel)
 plot(Ing, type = "trace")
 plot(Ing, type = "trace",which.items = 1:10)
@@ -55,3 +49,28 @@ plot(Ing, type = "infotrace")
 plot(Ing, type = "infotrace",which.items = c(1,43))
 plot(Ing, type = "infotrace",which.items = c(1,25))
 plot(Ing)
+#Regresión del puntaje de las pruebas segun variables sociodemograficas
+BF_sociodemo <- BF_PI[ , c("Calificación/50,00", 
+                           "GENERO", "ESTRATO", "COMPUTADOR", 
+                           "SMARTHPHONE_TABLET", "INTERNET", "TRABAJA") ]
+BF_sociodemo$GENERO <- ifelse(BF_sociodemo$GENERO == "F", 1,
+                              ifelse(BF_sociodemo$GENERO == "M", 0, NA))
+
+BF_sociodemo$COMPUTADOR <- ifelse(BF_sociodemo$COMPUTADOR == "Si", 1,
+                                  ifelse(BF_sociodemo$COMPUTADOR == "No", 0, NA))
+
+BF_sociodemo$SMARTHPHONE_TABLET <- ifelse(BF_sociodemo$SMARTHPHONE_TABLET == "Si", 1,
+                                          ifelse(BF_sociodemo$SMARTHPHONE_TABLET == "No", 0, NA))
+
+BF_sociodemo$INTERNET <- ifelse(BF_sociodemo$INTERNET == "Si", 1,
+                                ifelse(BF_sociodemo$INTERNET == "No", 0, NA))
+
+BF_sociodemo$TRABAJA <- ifelse(BF_sociodemo$TRABAJA == "Si", 1,
+                               ifelse(BF_sociodemo$TRABAJA == "No", 0, NA))
+RI<-lm(BF_sociodemo$`Calificación/50,00`~BF_sociodemo$GENERO+BF_sociodemo$ESTRATO+BF_sociodemo$COMPUTADOR+BF_sociodemo$SMARTHPHONE_TABLET+BF_sociodemo$INTERNET+BF_sociodemo$TRABAJA)
+summary(RI)
+step(RI)
+RF<-lm(BF_sociodemo$`Calificación/50,00` ~ BF_sociodemo$ESTRATO + BF_sociodemo$COMPUTADOR +BF_sociodemo$SMARTHPHONE_TABLET + BF_sociodemo$INTERNET)
+summary(RF)
+RP<-lm(BF_sociodemo$`Calificación/50,00` ~ BF_sociodemo$ESTRATO+BF_sociodemo$ESTRATO*BF_sociodemo$COMPUTADOR + BF_sociodemo$COMPUTADOR +BF_sociodemo$SMARTHPHONE_TABLET + BF_sociodemo$INTERNET)
+summary(RP)
